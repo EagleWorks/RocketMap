@@ -400,9 +400,9 @@ function showOverlay(id) {
     }
     resetMap()
     pokemonid = id
-    $('#location_details').show()
     location.hash = 'overlay_' + pokemonid
     updateDetails()
+    $('#location_details').show()
 
     return false
 }
@@ -485,6 +485,19 @@ function updateDetails() {
             radius: 50
         })
     })
+
+  // fit the bounds of the heatmap by determining the bounds of each marker
+  bounds = new google.maps.LatLngBounds()
+  $.each(mapData.appearances, function (id, val) {
+    bounds.extend(mapData.appearances[id].marker.getPosition())
+  })
+  // nudge the bounds a little if we'd end up zooming way in on a single location
+  if (bounds.getNorthEast().equals(bounds.getSouthWest())) {
+    bounds.extend(new google.maps.LatLng(bounds.getNorthEast().lat() + 0.005, bounds.getNorthEast().lng() + 0.005))
+    bounds.extend(new google.maps.LatLng(bounds.getNorthEast().lat() - 0.01, bounds.getNorthEast().lng() - 0.01))
+  }
+  // set the map to fit the bounds given
+  map.fitBounds(bounds)
 }
 
 if (location.href.match(/overlay_[0-9]+/g)) {
