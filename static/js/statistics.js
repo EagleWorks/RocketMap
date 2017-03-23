@@ -495,4 +495,10 @@ $('#nav select')
     .select2({
         minimumResultsForSearch: Infinity
     })
-    .on('change', updateStatMap)
+    .on('change', function() {
+      if (this.id == "duration") {
+        $("#duration").select2("open")
+        $("#duration").select2("close")
+      }
+      updateStatMap()
+    })
