@@ -2151,11 +2151,15 @@ $(function () {
         // setup the filter lists
         $selectExclude.select2({
             placeholder: i8ln('Select Pokémon'),
+            allowClear: true,
+            closeOnSelect: false,
             data: pokeList,
             templateResult: formatState
         })
         $selectPokemonNotify.select2({
             placeholder: i8ln('Select Pokémon'),
+            allowClear: true,
+            closeOnSelect: false,
             data: pokeList,
             templateResult: formatState
         })
@@ -2353,6 +2357,47 @@ $(function () {
             heightStyle: 'content'
         })
     }
+
+    // Select2 has a bug where selecting an item in a multi-select list causes
+    // it to scroll back to the top.  'Fix' this by forcing it to scoll back
+    // down to where the user was before.
+    // ref: https://github.com/select2/select2/issues/1513
+    function fixSelect2Scroll(id) {
+      $("#" + id).on('select2:selecting', function(event){
+        select2ScrollTop = $('#select2-' + id + '-results').prop('scrollTop');
+      });
+      $("#" + id).on('select2:select', function(event){
+        $('#select2-' + id + '-results').prop('scrollTop', select2ScrollTop );
+      });
+      $("#" + id).on('select2:unselecting', function(event){
+        select2ScrollTop = $('#select2-' + id + '-results').prop('scrollTop');
+      });
+      $("#" + id).on('select2:unselect', function(event){
+        $('#select2-' + id + '-results').prop('scrollTop', select2ScrollTop );
+      });
+    }
+    fixSelect2Scroll('exclude-pokemon')
+    fixSelect2Scroll('notify-pokemon')
+
+    // Select2 has another bug where the dropdown will open in an incorrect
+    // location if the list is long enough to require a scrollbar, and the
+    // dropdown opens up above the list, migrating ever further up.  
+    // ref: https://github.com/select2/select2/issues/3303
+    // select2:open fires off too soon to fix after the fact, so using a
+    // setTimmeout.
+    function fixSelect2ResultPos(id) {
+      $("#" + id).on('select2:open', function(e){
+        if ($(".select2-container--open .select2-dropdown--above").length > 0) {
+          setTimeout(function() {
+            if ($(".select2-container--open")[1]) {
+              $(".select2-container--open")[1].style.top = ($("#" + id).parent().offset().top - $(".select2-container--open")[1].scrollHeight) + "px"
+            }
+          }, 10)
+        }
+      })
+    }
+    fixSelect2ResultPos('exclude-pokemon')
+    fixSelect2ResultPos('notify-pokemon')
 
     // Initialize dataTable in statistics sidebar
     //   - turn off sorting for the 'icon' column

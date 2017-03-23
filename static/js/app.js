@@ -141,6 +141,12 @@
         if ($stats && event.target.matches('a[href="#stats"]')) {
             return
         }
+        // Prevent nav from closing when selecting options in a Select2 list,
+        // without having to set up listeners for the dynamically created lists.
+        if (event.target.matches('ul.select2-results__options, ul.select2-results__options *')) {
+            return
+        }
+
         $nav.classList.remove('visible')
         if ($stats) {
             $stats.classList.remove('visible')
