@@ -1862,6 +1862,22 @@ function showGymDetails(id) { // eslint-disable-line no-unused-vars
 
         sidebar.innerHTML = `${headerHtml}${pokemonHtml}`
 
+        // Expand / collapse all Gym Pokémon details
+        $("#gym-details-expandall").click(function(){
+          if ($(this).text() === "Expand all") {
+            $.each($("#gym-details .fa-angle-double-down"), function(i,v) {
+              toggleGymPokemonDetails($(v).closest("tr")[0])
+            })
+            $(this).text("Collapse all")
+          } else {
+            $.each($("#gym-details .fa-angle-double-up"), function(i,v) {
+              toggleGymPokemonDetails($(v).closest("tr")[0])
+            })
+            $(this).text("Expand all")
+          }
+          return false
+        })
+
         sidebarClose = document.createElement('a')
         sidebarClose.href = '#'
         sidebarClose.className = 'close'
