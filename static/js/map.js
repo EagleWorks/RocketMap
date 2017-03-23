@@ -33,6 +33,8 @@ var excludedPokemon = []
 var notifiedPokemon = []
 var notifiedRarity = []
 var notifiedMinPerfection = null
+var notifiedMarker
+var notifiedCircle
 
 var buffer = []
 var reincludedPokemon = []
@@ -602,12 +604,15 @@ function spawnpointLabel(item) {
 function addRangeCircle(marker, map, type, teamId) {
     var targetmap = null
     var circleCenter = new google.maps.LatLng(marker.position.lat(), marker.position.lng())
+
     var gymColors = ['#999999', '#0051CF', '#FF260E', '#FECC23'] // 'Uncontested', 'Mystic', 'Valor', 'Instinct']
     var teamColor = gymColors[0]
     if (teamId) teamColor = gymColors[teamId]
 
     var range
     var circleColor
+    var circleFillOpacity = 0.3
+    var circleStrokeWeight = 1
 
     // handle each type of marker and be explicit about the range circle attributes
     switch (type) {
@@ -623,6 +628,12 @@ function addRangeCircle(marker, map, type, teamId) {
             circleColor = teamColor
             range = 40
             break
+        case 'notification':
+        	circleColor = '#00FF00'
+        	circleFillOpacity = 0.75
+        	circleStrokeWeight = 3
+        	range = 40
+        	break
     }
 
     if (map) targetmap = map
@@ -630,12 +641,12 @@ function addRangeCircle(marker, map, type, teamId) {
     var rangeCircleOpts = {
         map: targetmap,
         radius: range, // meters
-        strokeWeight: 1,
+        strokeWeight: circleStrokeWeight,
         strokeColor: circleColor,
         strokeOpacity: 0.9,
         center: circleCenter,
         fillColor: circleColor,
-        fillOpacity: 0.3
+        fillOpacity: circleFillOpacity
     }
     var rangeCircle = new google.maps.Circle(rangeCircleOpts)
     return rangeCircle
@@ -1518,7 +1529,22 @@ function sendNotification(title, text, icon, lat, lng) {
             window.focus()
             notification.close()
 
-            centerMap(lat, lng, 20)
+            // Highlight the source of the notification, and center the map.
+            // This used to be a zoom in on the map as well.
+            if (notifiedCircle) {
+              notifiedCircle.setMap(null)
+              delete notifiedMarker.rangeCircle
+            }
+            notifiedCircle = addRangeCircle(marker,map,'notification')
+            google.maps.event.addListener(notifiedCircle, 'click', function() {
+                notifiedCircle.setMap(null)
+                delete notifiedMarker.rangeCircle
+                notifiedCircle = undefined
+            })
+            notifiedMarker = marker
+
+           // center the map on the source of the notification
+           centerMap(lat, lng, 17)
         }
     }
 }
