@@ -185,7 +185,7 @@
     $gymSidebarClose.href = '#'
     $gymSidebarClose.className = 'close'
     $gymSidebarClose.tabIndex = 0
-    $gymSidebar.appendChild($gymSidebarClose)
+    if ($gymSidebar) { $gymSidebar.appendChild($gymSidebarClose) }
 
     // Event: Hide on ESC.
     window.addEventListener('keydown', function (event) {
