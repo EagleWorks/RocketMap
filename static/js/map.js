@@ -1843,6 +1843,7 @@ function showGymDetails(id) { // eslint-disable-line no-unused-vars
             })
 
             pokemonHtml = `<table><tbody>${pokemonHtml}</tbody></table>`
+            pokemonHtml = pokemonHtml + `<div style="text-align:right"><button id="gym-details-expandall" style="height:auto; line-height:1.5em; background-color: #44f; border-radius:4px; padding:2px; font-size: 80%; font-weight:bold; color:#fff;">Expand all</button></div>`
         } else if (result.team_id === 0) {
             pokemonHtml = ''
         } else {
