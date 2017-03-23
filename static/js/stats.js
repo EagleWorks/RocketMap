@@ -55,6 +55,13 @@ function countMarkers(map) { // eslint-disable-line no-unused-vars
             }
         }
 
+        // show totals in the Stats sidebar.  First row: visible totals.  Second row: map totals.
+        var totalPokemon = Object.keys(mapData.pokemons).length + Object.keys(mapData.lurePokemons).length
+        $($('#pokemonList_table').dataTable().api().column(2).footer()).html(pkmnTotal)
+        $($('#pokemonList_table').dataTable().api().column(3).footer()).html((Math.round(pkmnTotal * 100 / totalPokemon * 10) / 10) + "%")
+        // dataTables doesn't provide easy access to multi-row footers.  Have to use standard accessors.
+        $('#pokemonList_table tfoot tr+tr td:nth-child(3)').html(Object.keys(mapData.pokemons).length)
+
         // Clear stale data, add fresh data, redraw
 
         $('#pokemonList_table').dataTable().show()
