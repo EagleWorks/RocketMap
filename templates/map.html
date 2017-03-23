@@ -32,6 +32,9 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/jqueryui/1.12.0/jquery-ui.min.css">
     <link rel="stylesheet" href="https://cdn.datatables.net/1.10.12/css/jquery.dataTables.css">
     <script src="{{ url_for('static', filename='js/vendor/modernizr.custom.js').lstrip('/') }}"></script>
+    <style>
+      #notifications-disabled { display:none; font-size:80%; color:#f00; }
+    </style>
   </head>
   <body id="top">
     <div class="wrapper">
@@ -268,6 +271,7 @@
 
           <h3>Notification Settings</h3>
           <div>
+            <div id="notifications-disabled"></div>
             <div class="form-control">
               <label for="notify-pokemon">
                 <h3>Notify of Pokémon</h3>

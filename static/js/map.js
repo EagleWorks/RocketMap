@@ -30,6 +30,7 @@ var searchMarkerStyles
 
 var timestamp
 var excludedPokemon = []
+var notificationPermission = ''
 var notifiedPokemon = []
 var notifiedRarity = []
 var notifiedMinPerfection = null
@@ -90,6 +91,38 @@ var notifyText = 'disappears at <dist> (<udist>)'
 //
 // Functions
 //
+
+function getNotificationPermission(forceRequest) {
+  // only run if Notification capability exists
+  if (!Notification) {
+    console.log('could not load notifications')
+    return
+  }
+  if (forceRequest === true) { notificationPermission = '' }
+  // only request permission if it wasn't clicked away/granted/denied
+  if (notificationPermission === '') {
+    notificationPermission = 'pending'
+    Notification.requestPermission().then(function(permission) {
+      notificationPermission = permission
+      console.log("Permission: '" + permission + "'")
+      switch(permission) {
+        case 'default':
+          $("#notifications-disabled").html("Notification permission has not been granted.<br /><a href='#' id='notifications-rerequest'>Re-request Notification permission</a>")
+          $("#notifications-rerequest").click(function(){ getNotificationPermission(true); return false; })
+          $("#notifications-disabled").show()
+          break
+        case 'denied':
+          $("#notifications-disabled").html("Notification permission has been blocked.<br />Unblock this site from your browser's site notifications, then <a href='#' id='notifications-rerequest'>re-request Notification permission</a>")
+          $("#notifications-rerequest").click(function(){ getNotificationPermission(true); return false; })
+          $("#notifications-disabled").show()
+          break
+        case 'granted':
+          $("#notifications-disabled").hide()
+          $("#notifications-disabled").html("")
+      }
+    })
+  }
+}
 
 function excludePokemon(id) { // eslint-disable-line no-unused-vars
     $selectExclude.val(
@@ -1506,7 +1539,7 @@ function sendNotification(title, text, icon, lat, lng) {
     }
 
     if (Notification.permission !== 'granted') {
-        Notification.requestPermission()
+      getNotificationPermission()
     } else {
         var notification = new Notification(title, {
             icon: icon,
@@ -1887,17 +1920,6 @@ function toggleGymPokemonDetails(e) { // eslint-disable-line no-unused-vars
 //
 
 $(function () {
-    if (!Notification) {
-        console.log('could not load notifications')
-        return
-    }
-
-    if (Notification.permission !== 'granted') {
-        Notification.requestPermission()
-    }
-})
-
-$(function () {
     // populate Navbar Style menu
     $selectStyle = $('#map-style')
 
@@ -2179,10 +2201,12 @@ $(function () {
         $selectPokemonNotify.on('change', function (e) {
             notifiedPokemon = $selectPokemonNotify.val().map(Number)
             Store.set('remember_select_notify', notifiedPokemon)
+            if (notifiedPokemon.length > 0) { getNotificationPermission() }
         })
         $selectRarityNotify.on('change', function (e) {
             notifiedRarity = $selectRarityNotify.val().map(String)
             Store.set('remember_select_rarity_notify', notifiedRarity)
+            if (notifiedRarity.length > 0) { getNotificationPermission() }
         })
         $textPerfectionNotify.on('change', function (e) {
             notifiedMinPerfection = parseInt($textPerfectionNotify.val(), 10)
@@ -2194,6 +2218,7 @@ $(function () {
             }
             $textPerfectionNotify.val(notifiedMinPerfection)
             Store.set('remember_text_perfection_notify', notifiedMinPerfection)
+            if (notifiedMinPerfection !== '') { getNotificationPermission() }
         })
 
         // recall saved lists
