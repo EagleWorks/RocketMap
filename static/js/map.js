@@ -35,6 +35,7 @@ var notifiedRarity = []
 var notifiedMinPerfection = null
 var notifiedMarker
 var notifiedCircle
+var notifiedId
 
 var buffer = []
 var reincludedPokemon = []
@@ -737,7 +738,7 @@ function customizePokemonMarker(marker, item, skipNotification) {
             if (Store.get('playSound')) {
                 audio.play()
             }
-            sendNotification(getNotifyText(item).fav_title, getNotifyText(item).fav_text, 'static/icons/' + item['pokemon_id'] + '.png', item['latitude'], item['longitude'])
+            sendNotification(getNotifyText(item).fav_title, getNotifyText(item).fav_text, 'static/icons/' + item['pokemon_id'] + '.png', item['latitude'], item['longitude'], item['encounter_id'], marker)
         }
         if (marker.animationDisabled !== true) {
             marker.setAnimation(google.maps.Animation.BOUNCE)
@@ -751,7 +752,7 @@ function customizePokemonMarker(marker, item, skipNotification) {
                 if (Store.get('playSound')) {
                     audio.play()
                 }
-                sendNotification(getNotifyText(item).fav_title, getNotifyText(item).fav_text, 'static/icons/' + item['pokemon_id'] + '.png', item['latitude'], item['longitude'])
+                sendNotification(getNotifyText(item).fav_title, getNotifyText(item).fav_text, 'static/icons/' + item['pokemon_id'] + '.png', item['latitude'], item['longitude'], item['encounter_id'], marker)
             }
             if (marker.animationDisabled !== true) {
                 marker.setAnimation(google.maps.Animation.BOUNCE)
@@ -1026,6 +1027,12 @@ function clearStaleMarkers() {
             if (mapData.pokemons[key].marker.rangeCircle) {
                 mapData.pokemons[key].marker.rangeCircle.setMap(null)
                 delete mapData.pokemons[key].marker.rangeCircle
+            }
+            if (notifiedMarker && (mapData.pokemons[key]['encounter_id'] === notifiedId)) {
+              notifiedCircle.setMap(null)
+              delete notifiedMarker.rangeCircle
+              notifiedMarker = undefined
+              notifiedId = undefined
             }
             mapData.pokemons[key].marker.setMap(null)
             delete mapData.pokemons[key]
@@ -1511,7 +1518,7 @@ function getPointDistance(pointA, pointB) {
     return google.maps.geometry.spherical.computeDistanceBetween(pointA, pointB)
 }
 
-function sendNotification(title, text, icon, lat, lng) {
+function sendNotification(title, text, icon, lat, lng, encounter_id, marker) {
     if (!('Notification' in window)) {
         return false // Notifications are not present in browser
     }
@@ -1530,8 +1537,7 @@ function sendNotification(title, text, icon, lat, lng) {
             notification.close()
 
             // Highlight the source of the notification, and center the map.
-            // This used to be a zoom in on the map as well.
-            if (notifiedCircle) {
+            if (notifiedMarker) {
               notifiedCircle.setMap(null)
               delete notifiedMarker.rangeCircle
             }
@@ -1540,8 +1546,10 @@ function sendNotification(title, text, icon, lat, lng) {
                 notifiedCircle.setMap(null)
                 delete notifiedMarker.rangeCircle
                 notifiedCircle = undefined
+                notifiedMarker = undefined
             })
             notifiedMarker = marker
+            notifiedId = encounter_id
 
            // center the map on the source of the notification
            centerMap(lat, lng, 17)
