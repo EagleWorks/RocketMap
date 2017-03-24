@@ -104,7 +104,6 @@ function getNotificationPermission(forceRequest) {
     notificationPermission = 'pending'
     Notification.requestPermission().then(function(permission) {
       notificationPermission = permission
-      console.log("Permission: '" + permission + "'")
       switch(permission) {
         case 'default':
           $("#notifications-disabled").html("Notification permission has not been granted.<br /><a href='#' id='notifications-rerequest'>Re-request Notification permission</a>")
