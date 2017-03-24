@@ -1897,6 +1897,28 @@ $(function () {
     }
 })
 
+// Close infoWindows (mon, gyms, stops, location, and search markers) when the Escape key is pressed.
+$(function () {
+  $(document).on('keyup',function(evt) {
+    if (evt.keyCode == 27) {
+      $.each([
+        mapData.pokemons,
+        mapData.lurePokemons,
+        mapData.gyms,
+        mapData.pokestops,
+        mapData.spawnpoints], function(key, dataset) {
+        $.each(dataset, function(key, value) {
+          if (dataset[key].marker.infoWindowIsOpen) {
+            dataset[key].marker.infoWindow.close()
+          }
+        })
+      })
+    }
+    locationMarker.infoWindow.close()
+    searchMarker.infoWindow.close()
+  })
+})
+
 $(function () {
     // populate Navbar Style menu
     $selectStyle = $('#map-style')
