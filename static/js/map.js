@@ -2175,10 +2175,12 @@ $(function () {
             reincludedPokemon = reincludedPokemon.concat(buffer)
             clearStaleMarkers()
             Store.set('remember_select_exclude', excludedPokemon)
+            $('#exclude-pokemon-bookmarklet').attr("href","javascript:(function()%7B%24(%22%23exclude-pokemon%22).val(%5B" + $selectExclude.val().toString() + "%5D).trigger(%22change%22)%7D)()")
         })
         $selectPokemonNotify.on('change', function (e) {
             notifiedPokemon = $selectPokemonNotify.val().map(Number)
             Store.set('remember_select_notify', notifiedPokemon)
+            $('#notify-pokemon-bookmarklet').attr("href","javascript:(function()%7B%24(%22%23notify-pokemon%22).val(%5B" + $selectPokemonNotify.val().toString() + "%5D).trigger(%22change%22)%7D)()")
         })
         $selectRarityNotify.on('change', function (e) {
             notifiedRarity = $selectRarityNotify.val().map(String)
@@ -2353,6 +2355,12 @@ $(function () {
             heightStyle: 'content'
         })
     }
+
+    // Shareable bookmarklets are all titled "shareable bookmarklet" by default.
+    // In order for users to recognize which is which when using drag-and-drop,
+    // change the text when the user starts dragging, revert when ending.
+    $('#exclude-pokemon-bookmarklet').on("mouseup dragend",function(k,v) { this.text = "shareable bookmarklet" })
+    $('#notify-pokemon-bookmarklet').on("mouseup dragend",function(k,v) { this.text = "shareable bookmarklet" })
 
     // Initialize dataTable in statistics sidebar
     //   - turn off sorting for the 'icon' column
