@@ -2359,7 +2359,9 @@ $(function () {
     // Shareable bookmarklets are all titled "shareable bookmarklet" by default.
     // In order for users to recognize which is which when using drag-and-drop,
     // change the text when the user starts dragging, revert when ending.
+    $('#exclude-pokemon-bookmarklet').on("mousedown",function(k,v) { this.text = "RM: Exclude " + $('#exclude-pokemon').val().length + " Pokémon" })
     $('#exclude-pokemon-bookmarklet').on("mouseup dragend",function(k,v) { this.text = "shareable bookmarklet" })
+    $('#notify-pokemon-bookmarklet').on("mousedown",function(k,v) { this.text = "RM: Notify of " + $selectPokemonNotify.val().length + " Pokémon" })
     $('#notify-pokemon-bookmarklet').on("mouseup dragend",function(k,v) { this.text = "shareable bookmarklet" })
 
     // Initialize dataTable in statistics sidebar
